@@ -16,6 +16,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -23,12 +25,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+
+import Module.Game;
 
 public class AddObjActivity extends AppCompatActivity  implements View.OnClickListener{
     private static final int PICK_IMAGE_ACTIVITY_REQUEST_CODE = 3737;
@@ -43,6 +49,7 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     Button setLocation, takeButton, uploadButton;
 
     private String imagePath = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,6 +164,10 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     }
 
     private void uploadPhoto() {
+        //TODO upload dediği zaman setLocationActivity'den mlatitute m longtitute'ları alacağız ve boş mu diye bakacağız.
+        //TODO user'in id sini alıcam nerden nasıl bilmiyorum. bos mu degil mi diye kontrol edicem.
+
+        new Game("1stGameId", "1stGameMakerId"); //add game
         if (imagePath == null) {
             Toast.makeText(this, "You need to Take/Pick photo!", Toast.LENGTH_LONG).show();
             return;
@@ -239,5 +250,25 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
+/*
+    public void sendLocationData(double mLat, double mLon){
+        // TODO: firebase'e gondericem.
+        //A GeoFire object is used to read and write geo location data to your Firebase database and to create queries. To create a new GeoFire instance you need to attach it to a Firebase database reference.
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("game");
+        GeoFire geoFire = new GeoFire(ref);
+
+        //To check if a write was successfully saved on the server, you can add a GeoFire.CompletionListener to the setLocation call:
+        geoFire.setLocation("location", new GeoLocation(mLat, mLon), new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, com.google.firebase.database.DatabaseError error) {
+                if (error != null) {
+                    System.err.println("There was an error saving the location to GeoFire: " + error);
+                } else {
+                    System.out.println("Location saved on server successfully!");
+                }
+            }
+        });
+    }
+*/
 
 }

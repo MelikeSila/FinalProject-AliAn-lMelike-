@@ -35,11 +35,13 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 
 import Module.Game;
+import Module.GameMaker;
+import Module.User;
 
 public class AddObjActivity extends AppCompatActivity  implements View.OnClickListener{
     private static final int PICK_IMAGE_ACTIVITY_REQUEST_CODE = 3737;
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 7171;
-
+    FirebaseUser user;
     //to authantication
     private static String TAG = "AddObjActivity";
     private FirebaseAuth mAuth;
@@ -60,7 +62,7 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
@@ -167,6 +169,19 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         //TODO upload dediği zaman setLocationActivity'den mlatitute m longtitute'ları alacağız ve boş mu diye bakacağız.
         //TODO user'in id sini alıcam nerden nasıl bilmiyorum. bos mu degil mi diye kontrol edicem.
 
+
+        if (user != null) {
+            // User is signed in
+            new User(user.getUid(), "userName");
+            Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+        } else {
+            // User is signed out
+            new User("gormedi Uid'yi", "userName");
+            Log.d(TAG, "onAuthStateChanged:signed_out");
+        }
+
+
+        new GameMaker("GId", "GMId");
         new Game("1stGameId", "1stGameMakerId"); //add game
         if (imagePath == null) {
             Toast.makeText(this, "You need to Take/Pick photo!", Toast.LENGTH_LONG).show();
@@ -175,8 +190,10 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
 
         Toast.makeText(getApplicationContext(), "Upload started...", Toast.LENGTH_LONG).show();
         Uri file = Uri.fromFile(new File(imagePath));
+
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         StorageReference riversRef = storageRef.child("/photos/" + file.getLastPathSegment());
+
         UploadTask uploadTask = riversRef.putFile(file);
 
         // Register observers to listen for when the download is done or if it fails

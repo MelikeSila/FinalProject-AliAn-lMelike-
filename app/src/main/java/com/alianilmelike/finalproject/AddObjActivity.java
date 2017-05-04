@@ -23,12 +23,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
 
 import Module.Game;
 import Module.PlayedGame;
@@ -196,7 +200,14 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     }
 
     private void uploadGame(){
-        new Game("xxx", user.getUid(), latitude, longitude, "p_url", "d" );
+        Calendar c = Calendar.getInstance();
+        int minute = c.get(Calendar.MINUTE);
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int day = c.get(Calendar.DATE);
+        //int month = c.(Calendar.DAY_OF_YEAR);
+        //int year = c.(Calendar.YEAR);
+        //Map<String, String> ms = ServerValue.TIMESTAMP;
+        new Game("xxx", user.getUid(), latitude, longitude, "p_url", minute, hour, day);
     }
 
     private void uploadPlayedGame(){

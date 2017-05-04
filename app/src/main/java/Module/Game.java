@@ -3,6 +3,8 @@ package Module;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Map;
+
 /**
  * Created by mafy on 01.05.2017.
  */
@@ -15,14 +17,12 @@ public class Game {
     public double location_lat=0;
     public double location_long=0;
     public String photo="";
-    public String date="";
+    public int minute;
+    public int hour;
+    public int day;
 
     private DatabaseReference mDatabase, mDatabase2, mDatabase3, mDatabase4, mDatabase5, mDatabase6;
-
-    public Game(){
-        //Default constructor required for calls to DataSnapshot.getValue(User.class)
-    }
-    public Game(String GId, String GMId, double lat, double lng, String p_url, String d ){
+    public Game(String GId, String GMId, double lat, double lng, String p_url, int m, int h, int d ){
 
         String path = FirebaseDatabase.getInstance().getReference("game/").push().getKey();
         mDatabase = FirebaseDatabase.getInstance().getReference("game/"+path);
@@ -36,7 +36,9 @@ public class Game {
         this.location_lat = lat;
         this.location_long= lng;
         this.photo = p_url;
-        this.date = d;
+        this.minute = m;
+        this.hour = h;
+        this.day = d;
         writeNewGame();
     }
 
@@ -46,7 +48,9 @@ public class Game {
         mDatabase3.child("location_latitude").setValue(location_lat);
         mDatabase4.child("location_longitude").setValue(location_long);
         mDatabase5.child("photourl").setValue(photo);
-        mDatabase6.child("date").setValue(date);
+        mDatabase6.child("minute").setValue(minute);
+        mDatabase6.child("hour").setValue(hour);
+        mDatabase6.child("day").setValue(day);
     }
 
 }

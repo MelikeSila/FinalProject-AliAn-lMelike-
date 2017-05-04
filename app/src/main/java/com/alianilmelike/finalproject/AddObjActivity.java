@@ -16,8 +16,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -25,8 +23,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -35,7 +31,7 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 
 import Module.Game;
-import Module.GameMaker;
+import Module.PlayedGame;
 import Module.User;
 
 public class AddObjActivity extends AppCompatActivity  implements View.OnClickListener{
@@ -170,6 +166,10 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         //TODO user'in id sini alıcam nerden nasıl bilmiyorum. bos mu degil mi diye kontrol edicem.
 
 
+        SetLocationActivity xx = new SetLocationActivity();
+        double lala = xx.getmLatitude();
+        double lolo = xx.getmLongitude();
+
         if (user != null) {
             // User is signed in
             new User(user.getUid(), "userName");
@@ -181,8 +181,8 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         }
 
 
-        new GameMaker("GId", "GMId");
-        new Game("1stGameId", "1stGameMakerId"); //add game
+        new PlayedGame("playedGameID", "GameId", "UserId", "Score");
+        new Game("GId", user.getUid(), "p_url", "d" );
         if (imagePath == null) {
             Toast.makeText(this, "You need to Take/Pick photo!", Toast.LENGTH_LONG).show();
             return;

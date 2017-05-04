@@ -24,6 +24,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.VisibleRegion;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -35,12 +36,16 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     Button setLocationButton;
-    private double mLatitude, mLongitude;
+    public double mLatitude, mLongitude;
+    private DatabaseReference mDatabase;
+    String GId="";
     public void SetLocationActivity(){
         //Am I need to do something here? TODO
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        GId = "GId"; //burya gameId'yi göndericem
+        mDatabase = FirebaseDatabase.getInstance().getReference("game/"+GId);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_location);
         setLocationButton = (Button) findViewById(R.id.setLocationButton);
@@ -170,7 +175,7 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.setLocationButton:
-                saveLocation();
+                saveLocation(GId);
                 Intent i = new Intent(getApplicationContext(), AddObjActivity.class);
                 startActivity(i);
                 break;
@@ -183,14 +188,16 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     public double getmLongitude(){
         return mLongitude;
     }
-    public void saveLocation(){
+
+    public void saveLocation(String GId){
         //mLatitude
         //mLatitude
         // TODO: firebase'e gondericem.
         //A GeoFire object is used to read and write geo location data to your Firebase database and to create queries. To create a new GeoFire instance you need to attach it to a Firebase database reference.
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("game");
-        GeoFire geoFire = new GeoFire(ref);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("game/"+GId);
+        //GeoFire geoFire = new GeoFire(ref);
 
+        /*
         //To check if a write was successfully saved on the server, you can add a GeoFire.CompletionListener to the setLocation call:
         geoFire.setLocation("location", new GeoLocation(mLatitude, mLongitude), new GeoFire.CompletionListener() {
             @Override
@@ -201,6 +208,8 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                     System.out.println("Location saved on server successfully!");
                 }
             }
-        });
+        });*/
+        mDatabase.child("location_latitude").setValue(mLatitude);
+        mDatabase.child("location_longitude").setValue(mLongitude);
     }
 }

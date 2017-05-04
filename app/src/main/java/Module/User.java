@@ -13,9 +13,12 @@ public class User {
     public String userId="";
     public String userName="";
     private DatabaseReference mDatabase, mDatabase2;
+    public User(){
+        //Default constructor required for calls to DataSnapshot.getValue(User.class)
+    }
 
     public User(String UId, String UName){
-        //mDatabase = FirebaseDatabase.getInstance().getReference("user");
+        mDatabase = FirebaseDatabase.getInstance().getReference("users");
         mDatabase2 = FirebaseDatabase.getInstance().getReference("users");
         this.userId = UId;
         this.userName = UName;
@@ -24,6 +27,6 @@ public class User {
 
     private void writeNewGame(String UId, String uName){
         mDatabase2.child(UId).child("userName").setValue(uName);
-        //mDatabase.push().child("userId").setValue(UId);
+        mDatabase.child(UId).child("userId").setValue(UId);
     }
 }

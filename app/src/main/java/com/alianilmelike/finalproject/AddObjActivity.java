@@ -34,7 +34,12 @@ import Module.Game;
 import Module.PlayedGame;
 import Module.User;
 
+import static com.alianilmelike.finalproject.SetLocationActivity.KEY_LATITUDE;
+import static com.alianilmelike.finalproject.SetLocationActivity.KEY_LONGITUDE;
+import static com.alianilmelike.finalproject.SetLocationActivity.KEY_STRING;
+
 public class AddObjActivity extends AppCompatActivity  implements View.OnClickListener{
+    public static final int SET_LOCATION_REQUEST_CODE = 4444 ;
     private static final int PICK_IMAGE_ACTIVITY_REQUEST_CODE = 3737;
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 7171;
     FirebaseUser user;
@@ -42,6 +47,7 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     private static String TAG = "AddObjActivity";
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    public double longitude, latitude;
 
     ImageView imageView;
     Button setLocation, takeButton, uploadButton;
@@ -108,14 +114,15 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
                 takePhoto();
                 break;
             case R.id.uploadPhoto:
-                uploadPhoto();
+                upload();
                 break;
         }
     }
 
     private void setLocation() {
         Intent i = new Intent(getApplicationContext(), SetLocationActivity.class);
-        startActivity(i);
+        i.putExtra(KEY_STRING,43);
+        startActivityForResult(i,SET_LOCATION_REQUEST_CODE);
     }
 
     private void pickPhoto() {
@@ -160,15 +167,21 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
             Toast.makeText(this, "You need to Take/Pick photo!", Toast.LENGTH_LONG).show();
         }
     }
+    private void upload(){
+        uploadPhoto();
+        uploadLocation();
+        uploadUser();
+        uploadGame();
+        uploadPlayedGame();
+    }
 
-    private void uploadPhoto() {
-        //TODO upload dediği zaman setLocationActivity'den mlatitute m longtitute'ları alacağız ve boş mu diye bakacağız.
-        //TODO user'in id sini alıcam nerden nasıl bilmiyorum. bos mu degil mi diye kontrol edicem.
-
-
+    private void uploadLocation(){
         SetLocationActivity xx = new SetLocationActivity();
         double lala = xx.getmLatitude();
         double lolo = xx.getmLongitude();
+    }
+
+    private void uploadUser(){
 
         if (user != null) {
             // User is signed in
@@ -180,19 +193,28 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
             Log.d(TAG, "onAuthStateChanged:signed_out");
         }
 
+    }
 
-        new PlayedGame("playedGameID", "GameId", "UserId", "Score");
-        new Game("GId", user.getUid(), "p_url", "d" );
+    private void uploadGame(){
+        new Game("xxx", user.getUid(), latitude, longitude, "p_url", "d" );
+    }
+
+    private void uploadPlayedGame(){
+        new PlayedGame("playedGameID2", "GameId", "UserId", "Score");
+    }
+
+    private void uploadPhoto() {
+        //TODO upload dediği zaman setLocationActivity'den mlatitute m longtitute'ları alacağız ve boş mu diye bakacağız.
+        //TODO user'in id sini alıcam nerden nasıl bilmiyorum. bos mu degil mi diye kontrol edicem.
         if (imagePath == null) {
             Toast.makeText(this, "You need to Take/Pick photo!", Toast.LENGTH_LONG).show();
             return;
         }
-
         Toast.makeText(getApplicationContext(), "Upload started...", Toast.LENGTH_LONG).show();
         Uri file = Uri.fromFile(new File(imagePath));
 
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-        StorageReference riversRef = storageRef.child("/photos/" + file.getLastPathSegment());
+        StorageReference riversRef = storageRef.child("/photos/" + user.getUid()+ "/" + file.getLastPathSegment()); //burayi oyun id ile degistirecegiz.
 
         UploadTask uploadTask = riversRef.putFile(file);
 
@@ -241,6 +263,10 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
                     return;
                 }
                 showImage(imagePath);
+            }  else if(requestCode == SET_LOCATION_REQUEST_CODE){
+                latitude = data.getDoubleExtra(KEY_LATITUDE, 0.0);
+                longitude = data.getDoubleExtra(KEY_LONGITUDE, 0.0);
+
             }
         }
     }

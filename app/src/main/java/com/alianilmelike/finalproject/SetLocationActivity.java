@@ -1,5 +1,6 @@
 package com.alianilmelike.finalproject;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -32,6 +33,11 @@ import Module.Game;
 
 public class SetLocationActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener  {
 
+    public static String KEY_STRING ="asdasd";
+    public static String KEY_LATITUDE = "latitude";
+    public static String KEY_LONGITUDE = "longitude";
+
+
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
@@ -44,7 +50,8 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        GId = "GId"; //burya gameId'yi göndericem
+        int bb = getIntent().getIntExtra(KEY_STRING,0);
+        GId = "GId2"; //burya gameId'yi göndericem
         mDatabase = FirebaseDatabase.getInstance().getReference("game/"+GId);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_location);
@@ -175,9 +182,11 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.setLocationButton:
-                saveLocation(GId);
-                Intent i = new Intent(getApplicationContext(), AddObjActivity.class);
-                startActivity(i);
+                Intent i = new Intent();
+                i.putExtra(KEY_LATITUDE, mLatitude);
+                i.putExtra(KEY_LONGITUDE,mLongitude);
+                setResult(Activity.RESULT_OK,i);
+                finish();
                 break;
         }
     }
@@ -187,29 +196,5 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     }
     public double getmLongitude(){
         return mLongitude;
-    }
-
-    public void saveLocation(String GId){
-        //mLatitude
-        //mLatitude
-        // TODO: firebase'e gondericem.
-        //A GeoFire object is used to read and write geo location data to your Firebase database and to create queries. To create a new GeoFire instance you need to attach it to a Firebase database reference.
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("game/"+GId);
-        //GeoFire geoFire = new GeoFire(ref);
-
-        /*
-        //To check if a write was successfully saved on the server, you can add a GeoFire.CompletionListener to the setLocation call:
-        geoFire.setLocation("location", new GeoLocation(mLatitude, mLongitude), new GeoFire.CompletionListener() {
-            @Override
-            public void onComplete(String key, com.google.firebase.database.DatabaseError error) {
-                if (error != null) {
-                    System.err.println("There was an error saving the location to GeoFire: " + error);
-                } else {
-                    System.out.println("Location saved on server successfully!");
-                }
-            }
-        });*/
-        mDatabase.child("location_latitude").setValue(mLatitude);
-        mDatabase.child("location_longitude").setValue(mLongitude);
     }
 }

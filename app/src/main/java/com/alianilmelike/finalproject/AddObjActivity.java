@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -30,8 +31,11 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import Module.Game;
@@ -52,7 +56,7 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     public double longitude, latitude;
-
+    public List<String> photoList;
     ImageView imageView;
     Button setLocation, takeButton, uploadButton;
 
@@ -173,16 +177,9 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     }
     private void upload(){
         uploadPhoto();
-        uploadLocation();
         uploadUser();
         uploadGame();
         uploadPlayedGame();
-    }
-
-    private void uploadLocation(){
-        SetLocationActivity xx = new SetLocationActivity();
-        double lala = xx.getmLatitude();
-        double lolo = xx.getmLongitude();
     }
 
     private void uploadUser(){
@@ -200,14 +197,14 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     }
 
     private void uploadGame(){
+
+        //To Date
         Calendar c = Calendar.getInstance();
         int minute = c.get(Calendar.MINUTE);
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int day = c.get(Calendar.DATE);
-        //int month = c.(Calendar.DAY_OF_YEAR);
-        //int year = c.(Calendar.YEAR);
-        //Map<String, String> ms = ServerValue.TIMESTAMP;
-        new Game("xxx", user.getUid(), latitude, longitude, "p_url", minute, hour, day);
+
+        new Game("xxx", user.getUid(), latitude, longitude, photoList, minute, hour, day);
     }
 
     private void uploadPlayedGame(){
@@ -225,8 +222,12 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         Uri file = Uri.fromFile(new File(imagePath));
 
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-        StorageReference riversRef = storageRef.child("/photos/" + user.getUid()+ "/" + file.getLastPathSegment()); //burayi oyun id ile degistirecegiz.
-
+        StorageReference riversRef = storageRef.child("/photos/" + "xxx" + "/" + file.getLastPathSegment()); //burayi oyun id ile degistirecegiz.
+        //photo URL to send firebase
+        photoList = new ArrayList<String>();
+        photoList.add(file.getLastPathSegment());
+        photoList.add("deneme");
+        photoList.add("deneme");
         UploadTask uploadTask = riversRef.putFile(file);
 
         // Register observers to listen for when the download is done or if it fails
@@ -257,7 +258,6 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            Toast.makeText(getApplicationContext(), "Image selected!", Toast.LENGTH_LONG).show();
             if (requestCode == PICK_IMAGE_ACTIVITY_REQUEST_CODE) {
                 if (data == null) {
                     return;
@@ -273,6 +273,7 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
                 if (imagePath == null) {
                     return;
                 }
+                Toast.makeText(getApplicationContext(), "Image selected!", Toast.LENGTH_LONG).show();
                 showImage(imagePath);
             }  else if(requestCode == SET_LOCATION_REQUEST_CODE){
                 latitude = data.getDoubleExtra(KEY_LATITUDE, 0.0);
@@ -304,25 +305,4 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
-/*
-    public void sendLocationData(double mLat, double mLon){
-        // TODO: firebase'e gondericem.
-        //A GeoFire object is used to read and write geo location data to your Firebase database and to create queries. To create a new GeoFire instance you need to attach it to a Firebase database reference.
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("game");
-        GeoFire geoFire = new GeoFire(ref);
-
-        //To check if a write was successfully saved on the server, you can add a GeoFire.CompletionListener to the setLocation call:
-        geoFire.setLocation("location", new GeoLocation(mLat, mLon), new GeoFire.CompletionListener() {
-            @Override
-            public void onComplete(String key, com.google.firebase.database.DatabaseError error) {
-                if (error != null) {
-                    System.err.println("There was an error saving the location to GeoFire: " + error);
-                } else {
-                    System.out.println("Location saved on server successfully!");
-                }
-            }
-        });
-    }
-*/
-
 }

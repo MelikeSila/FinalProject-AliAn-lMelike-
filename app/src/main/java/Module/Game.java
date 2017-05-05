@@ -1,9 +1,13 @@
 package Module;
 
+import android.media.ExifInterface;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.List;
 import java.util.Map;
+
 
 /**
  * Created by mafy on 01.05.2017.
@@ -11,20 +15,19 @@ import java.util.Map;
 
 public class Game {
     //To read or write data from the database, you need an instance of DatabaseReference:
-
     public String gameId="";
     public String gameMakerId="";
     public double location_lat=0;
     public double location_long=0;
-    public String photo="";
+    public List<String> photo;
     public int minute;
     public int hour;
     public int day;
-
+    public String path;
     private DatabaseReference mDatabase, mDatabase2, mDatabase3, mDatabase4, mDatabase5, mDatabase6;
-    public Game(String GId, String GMId, double lat, double lng, String p_url, int m, int h, int d ){
+    public Game(String GId, String GMId, double lat, double lng, List<String> p_url, int m, int h, int d ){
 
-        String path = FirebaseDatabase.getInstance().getReference("game/").push().getKey();
+        path = FirebaseDatabase.getInstance().getReference("game/").push().getKey();
         mDatabase = FirebaseDatabase.getInstance().getReference("game/"+path);
         mDatabase2 = FirebaseDatabase.getInstance().getReference("game/"+path);
         mDatabase3 = FirebaseDatabase.getInstance().getReference("game/"+path);
@@ -52,5 +55,4 @@ public class Game {
         mDatabase6.child("hour").setValue(hour);
         mDatabase6.child("day").setValue(day);
     }
-
 }

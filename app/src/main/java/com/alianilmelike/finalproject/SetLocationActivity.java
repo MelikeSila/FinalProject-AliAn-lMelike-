@@ -190,11 +190,4 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
                 break;
         }
     }
-
-    public double getmLatitude(){
-        return mLatitude;
-    }
-    public double getmLongitude(){
-        return mLongitude;
-    }
 }

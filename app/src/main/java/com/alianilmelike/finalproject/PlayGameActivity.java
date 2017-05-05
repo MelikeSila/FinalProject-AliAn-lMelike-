@@ -25,7 +25,7 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
 
     private GoogleMap mMap;
     private static String TAG = "PlayGameActivity";
-
+    private DatabaseReference mDatabase;
     PostGame post;
     DatabaseReference mPostReference;
 
@@ -59,6 +59,7 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         // Add a marker in Sydney and move the camera
+        ReadGames();
         LatLng sydney = new LatLng(-34, 151);
         //LatLng sydney = new LatLng(Double.parseDouble(la), Double.parseDouble(lo));
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
@@ -83,5 +84,8 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
             }
         };
         mPostReference.addValueEventListener(postListener);
+    }
+    public void ReadGames(){
+        mDatabase.getDatabase();
     }
 }

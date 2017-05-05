@@ -59,7 +59,7 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     public List<String> photoList;
     ImageView imageView;
     Button setLocation, takeButton, uploadButton;
-
+    public Uri downloadUrl;
     private String imagePath = null;
 
     @Override
@@ -177,6 +177,9 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     }
     private void upload(){
         uploadPhoto();
+    }
+    //we call tgis method under onSuccess method in uploadPhoto. because take photos url.
+    private void uploadOtherData(){
         uploadUser();
         uploadGame();
         uploadPlayedGame();
@@ -222,12 +225,8 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         Uri file = Uri.fromFile(new File(imagePath));
 
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-        StorageReference riversRef = storageRef.child("/photos/" + "xxx" + "/" + file.getLastPathSegment()); //burayi oyun id ile degistirecegiz.
-        //photo URL to send firebase
-        photoList = new ArrayList<String>();
-        photoList.add(file.getLastPathSegment());
-        photoList.add("deneme");
-        photoList.add("deneme");
+        StorageReference riversRef = storageRef.child(file.getLastPathSegment()); //burayi oyun id ile degistirecegiz.
+
         UploadTask uploadTask = riversRef.putFile(file);
 
         // Register observers to listen for when the download is done or if it fails
@@ -246,9 +245,15 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
                 imagePath = null;
                 Toast.makeText(getApplicationContext(), "Upload Successful!", Toast.LENGTH_LONG).show();
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                downloadUrl = taskSnapshot.getDownloadUrl();
                 if (downloadUrl != null) {
-
+                    //photo URL to send firebase
+                    photoList = new ArrayList<String>();
+                    String rr = downloadUrl.toString();
+                    photoList.add(rr);
+                    photoList.add("deneme");
+                    photoList.add("deneme");
+                    uploadOtherData();
                 }
             }
         });

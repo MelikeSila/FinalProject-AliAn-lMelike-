@@ -43,7 +43,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     private Location mLastLocation;
     Button setLocationButton;
     public double mLatitude, mLongitude;
-    private DatabaseReference mDatabase;
     String GId="";
     public void SetLocationActivity(){
         //Am I need to do something here? TODO
@@ -52,7 +51,6 @@ public class SetLocationActivity extends FragmentActivity implements OnMapReadyC
     protected void onCreate(Bundle savedInstanceState) {
         int bb = getIntent().getIntExtra(KEY_STRING,0);
         GId = "GId2"; //burya gameId'yi göndericem
-        mDatabase = FirebaseDatabase.getInstance().getReference("game/"+GId);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_location);
         setLocationButton = (Button) findViewById(R.id.setLocationButton);

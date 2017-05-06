@@ -14,8 +14,8 @@ public class PostGame {
 
     public String gameId="";
     public String gameMakerId="";
-    public String location_lat="";
-    public String location_long="";
+    public double location_latitude = 0.0;
+    public double location_longitude=0.0;
     public String photo="";
     public String date="";
 
@@ -29,8 +29,8 @@ public class PostGame {
     public PostGame(String GId, String GMId, String lat, String longi, String p_url, String d) {
         this.gameId = GId;
         this.gameMakerId = GMId;
-        this.location_lat = lat;
-        this.location_long= longi;
+        this.location_latitude = Double.parseDouble(lat);
+        this.location_longitude= Double.parseDouble(longi);
         this.photo = p_url;
         this.date = d;
     }
@@ -40,8 +40,8 @@ public class PostGame {
         HashMap<String, Object> result = new HashMap<>();
         result.put("gameId", gameId);
         result.put("gameMakerId", gameMakerId);
-        result.put("location_latitude", location_lat);
-        result.put("location_longitude", location_long);
+        result.put("location_latitude", location_latitude);
+        result.put("location_longitude", location_longitude);
         result.put("photourl", photo);
         result.put("date", date);
         return result;

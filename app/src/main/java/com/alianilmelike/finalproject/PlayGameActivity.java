@@ -19,7 +19,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -32,11 +31,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import Module.PostGame;
-
-import static android.widget.Toast.LENGTH_SHORT;
 
 public class PlayGameActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener{
     private GoogleApiClient mGoogleApiClient;
@@ -44,18 +43,15 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
     public double mLatitude, mLongitude;
     private GoogleMap mMap;
     private static String TAG = "PlayGameActivity";
-    private DatabaseReference mDatabase;
     public double latitude=0.0, longitude=0.0;
-    PostGame post;
-    DatabaseReference mPostReference;
     private Marker mCustomerMarker;
-
+    private List<String> gameIds = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_game);
         //firebase
-        createDataListener();
+        getGameIds();
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -155,9 +151,30 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
 
 
     }
-    public void createDataListener(){
-
-        DatabaseReference mPostReference =  FirebaseDatabase.getInstance().getReference("game/"+"-KjO0twJYp5BSaXigOr9/");
+    private void getGameIds(){
+        //Get datasnapshot at your "users" root node
+        if (mCustomerMarker != null) {
+            mCustomerMarker.remove();
+        }
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("game");
+        ref.addValueEventListener(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                            gameIds.add(ds.getKey());
+                            Toast.makeText(getApplicationContext(),ds.getKey(),Toast.LENGTH_SHORT).show();
+                            createDataListener(ds.getKey());
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        //handle databaseError
+                    }
+                });
+    }
+    public void createDataListener(String path){
+        DatabaseReference mPostReference = FirebaseDatabase.getInstance().getReference("game/"+path+"/");
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -165,12 +182,16 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
                 PostGame post = dataSnapshot.getValue(PostGame.class);
                 latitude = post.location_latitude;
                 longitude = post.location_longitude;
-                Toast.makeText(getApplicationContext(), String.valueOf(post.location_latitude) + ", " + String.valueOf(post.location_longitude),Toast.LENGTH_LONG).show();
+                List <String> urls= post.photo_url;
+                for(String s : urls){
+                    Toast.makeText(getApplicationContext(), s,Toast.LENGTH_LONG).show();
+                }
+                //TODO burda gamelerin idlerini liste şeklinde alıp tek tek oyunların bilgilerini almak için göndericem....
+
+                //Toast.makeText(getApplicationContext(), St    ring.valueOf(urls.get(1)) + ", " + String.valueOf(post.location_longitude),Toast.LENGTH_LONG).show();
                 // ...
                 //draw the marker on my map again.
-                if (mCustomerMarker != null) {
-                    mCustomerMarker.remove();
-                }
+
                 LatLng mCustomerLatLng = new LatLng(latitude, longitude);
                 MarkerOptions options = new MarkerOptions();
                 mMap.addMarker(options.position(mCustomerLatLng).title(getResources().getString(R.string.app_name)));

@@ -34,10 +34,17 @@
         android:text="Take Photo" />
 
     <Button
+        android:id="@+id/addSubGameButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/takePhoto"
+        android:text="Add Sub Game" />
+
+    <Button
         android:id="@+id/uploadPhoto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/takePhoto"
+        android:layout_below="@id/addSubGameButton"
         android:text="Upload" />
 
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package com.alianilmelike.finalproject;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -23,23 +24,19 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import Module.Game;
 import Module.PlayedGame;
+import Module.TargetModel;
 import Module.User;
 
 import static com.alianilmelike.finalproject.SetLocationActivity.KEY_LATITUDE;
@@ -58,15 +55,22 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     public double longitude, latitude;
     public List<String> photoList;
     ImageView imageView;
-    Button setLocation, takeButton, uploadButton;
+    Button setLocation, takeButton, uploadButton, addSubGameButton;
     public Uri downloadUrl;
     private String imagePath = null;
-
+    private String oldPath=null;
+    private String gameStatus=null;
+    public List <TargetModel> targetModelList = new ArrayList<>();
+    public String photoUrl;
+    public ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_obj);
-
+        photoList = new ArrayList<String>();
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Target Loading Please Wait...");
+        progressDialog.setCancelable(false);
         //to authantication
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -105,10 +109,12 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         imageView = (ImageView) findViewById(R.id.imageContainer);
         setLocation = (Button) findViewById(R.id.setLocation);
         takeButton = (Button) findViewById(R.id.takePhoto);
+        addSubGameButton = (Button) findViewById(R.id.addSubGameButton);
         uploadButton = (Button) findViewById(R.id.uploadPhoto);
 
         setLocation.setOnClickListener(this);
         takeButton.setOnClickListener(this);
+        addSubGameButton.setOnClickListener(this);
         uploadButton.setOnClickListener(this);
     }
 
@@ -121,7 +127,12 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
             case R.id.takePhoto:
                 takePhoto();
                 break;
+            case R.id.addSubGameButton:
+                gameStatus = "subGame";
+                AddSubGameButton();
+                break;
             case R.id.uploadPhoto:
+                gameStatus ="newGame";
                 upload();
                 break;
         }
@@ -175,14 +186,24 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
             Toast.makeText(this, "You need to Take/Pick photo!", Toast.LENGTH_LONG).show();
         }
     }
+    private void AddSubGameButton(){
+        if(latitude == 0d && longitude == 0d){
+            Toast.makeText(getApplicationContext(), "please select Location", Toast.LENGTH_SHORT).show();
+        }else{
+            uploadPhoto();
+        }
+        //Intent i = new Intent(getApplicationContext(), AddObjActivity.class);
+        //startActivity(i);
+    }
     private void upload(){
-        uploadPhoto();
+        uploadOtherData();
     }
     //we call tgis method under onSuccess method in uploadPhoto. because take photos url.
     private void uploadOtherData(){
-        uploadUser();
+        //uploadUser();
         uploadGame();
-        uploadPlayedGame();
+        //uploadPlayedGame();
+        finish();
     }
 
     private void uploadUser(){
@@ -207,7 +228,8 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int day = c.get(Calendar.DATE);
 
-        new Game("xxx", user.getUid(), latitude, longitude, photoList, minute, hour, day);
+        Game obje = new Game(targetModelList, minute, hour, day);
+        oldPath = obje.path;
     }
 
     private void uploadPlayedGame(){
@@ -221,11 +243,12 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
             Toast.makeText(this, "You need to Take/Pick photo!", Toast.LENGTH_LONG).show();
             return;
         }
-        Toast.makeText(getApplicationContext(), "Upload started...", Toast.LENGTH_LONG).show();
-        Uri file = Uri.fromFile(new File(imagePath));
 
+        Toast.makeText(getApplicationContext(), "Upload started...", Toast.LENGTH_LONG).show();
+        progressDialog.show();
+        Uri file = Uri.fromFile(new File(imagePath));
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-        StorageReference riversRef = storageRef.child(file.getLastPathSegment()); //burayi oyun id ile degistirecegiz.
+        StorageReference riversRef = storageRef.child(file.getLastPathSegment());
 
         UploadTask uploadTask = riversRef.putFile(file);
 
@@ -234,6 +257,7 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle unsuccessful uploads
+                progressDialog.hide();
                 if (exception != null) {
 
                 }
@@ -242,18 +266,19 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                progressDialog.hide();
                 imagePath = null;
                 Toast.makeText(getApplicationContext(), "Upload Successful!", Toast.LENGTH_LONG).show();
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                 downloadUrl = taskSnapshot.getDownloadUrl();
                 if (downloadUrl != null) {
                     //photo URL to send firebase
-                    photoList = new ArrayList<String>();
                     String rr = downloadUrl.toString();
+                    photoUrl = rr;
                     photoList.add(rr);
                     photoList.add("deneme");
                     photoList.add("deneme");
-                    uploadOtherData();
+                    targetModelList.add(new TargetModel(photoUrl, latitude, longitude));
                 }
             }
         });

@@ -5,4 +5,8 @@
     <string name="title_activity_obj_property">ObjPropertyActivity</string>
     <string name="title_activity_add_obj">AddObjActivity</string>
     <string name="title_activity_set_location">Map</string>
+    <string name="title_activity_selected_game">SelectedGameActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>

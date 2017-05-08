@@ -1,5 +1,6 @@
 package com.alianilmelike.finalproject;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -183,9 +184,9 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
                 latitude = post.location_latitude;
                 longitude = post.location_longitude;
                 List <String> urls= post.photo_url;
-                for(String s : urls){
+                /*for(String s : urls){
                     Toast.makeText(getApplicationContext(), s,Toast.LENGTH_LONG).show();
-                }
+                }*/
                 //TODO burda gamelerin idlerini liste şeklinde alıp tek tek oyunların bilgilerini almak için göndericem....
 
                 //Toast.makeText(getApplicationContext(), St    ring.valueOf(urls.get(1)) + ", " + String.valueOf(post.location_longitude),Toast.LENGTH_LONG).show();
@@ -194,7 +195,17 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
 
                 LatLng mCustomerLatLng = new LatLng(latitude, longitude);
                 MarkerOptions options = new MarkerOptions();
-                mMap.addMarker(options.position(mCustomerLatLng).title(getResources().getString(R.string.app_name)));
+                //mMap.addMarker(options.position(mCustomerLatLng).title(getResources().getString(R.string.app_name)));
+                mMap.addMarker(options.position(mCustomerLatLng).title("Click to Start"));
+                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                    @Override
+                    public void onInfoWindowClick(Marker marker) {
+                        Intent intent = new Intent(PlayGameActivity.this,SelectedGameActivity.class);
+                        startActivity(intent);
+
+
+                    }
+                });
                 //options.icon(BitmapDescriptorFactory.fromResource(R.drawable.aaaa));
                 mCustomerMarker = mMap.addMarker(options);
                 goMyLocation();

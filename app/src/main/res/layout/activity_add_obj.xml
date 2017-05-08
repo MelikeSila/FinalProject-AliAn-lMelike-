@@ -14,7 +14,7 @@
         android:id="@+id/imageContainer"
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        android:background="#ddd" />
+        android:background="@color/photoBackground" />
 
     <Button
         android:id="@+id/setLocation"

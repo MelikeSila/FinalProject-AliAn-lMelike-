@@ -3,6 +3,7 @@ package com.alianilmelike.finalproject;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +30,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import org.parceler.Parcels;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,6 +41,8 @@ import Module.Game;
 import Module.PlayedGame;
 import Module.TargetModel;
 import Module.User;
+import icepick.Icepick;
+import icepick.State;
 
 import static com.alianilmelike.finalproject.SetLocationActivity.KEY_LATITUDE;
 import static com.alianilmelike.finalproject.SetLocationActivity.KEY_LONGITUDE;
@@ -47,25 +52,33 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     public static final int SET_LOCATION_REQUEST_CODE = 4444 ;
     private static final int PICK_IMAGE_ACTIVITY_REQUEST_CODE = 3737;
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 7171;
+    private static final String KEY_TARGET_LIST = "KeyTargetList";
+
     FirebaseUser user;
     //to authantication
     private static String TAG = "AddObjActivity";
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    public double longitude, latitude;
+    @State double longitude;
+    @State double latitude;
     public List<String> photoList;
     ImageView imageView;
     Button setLocation, takeButton, uploadButton, addSubGameButton;
     public Uri downloadUrl;
-    private String imagePath = null;
+    @State String imagePath = null;
     private String oldPath=null;
     private String gameStatus=null;
-    public List <TargetModel> targetModelList = new ArrayList<>();
-    public String photoUrl;
+    List <TargetModel> targetModelList = new ArrayList<>();
+    @State String photoUrl;
     public ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Icepick.restoreInstanceState(this, savedInstanceState);
+        if (savedInstanceState != null){
+            targetModelList = Parcels.unwrap(savedInstanceState.getParcelable(KEY_TARGET_LIST));
+        }
+
         setContentView(R.layout.activity_add_obj);
         photoList = new ArrayList<String>();
         progressDialog = new ProgressDialog(this);
@@ -116,6 +129,16 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         takeButton.setOnClickListener(this);
         addSubGameButton.setOnClickListener(this);
         uploadButton.setOnClickListener(this);
+        if(imagePath != null){
+            showImage(imagePath);
+        }
+    }
+
+
+    @Override public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(KEY_TARGET_LIST, Parcels.wrap(targetModelList));
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 
     @Override
@@ -279,7 +302,12 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
                     photoList.add("deneme");
                     photoList.add("deneme");
                     targetModelList.add(new TargetModel(photoUrl, latitude, longitude));
+                    latitude = 0d;
+                    longitude = 0d;
+                    photoUrl = null;
                 }
+                imageView.setBackgroundColor(Color.TRANSPARENT);
+                imageView.setImageResource(R.drawable.img_bg);
             }
         });
     }
@@ -334,5 +362,16 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
+    }
+    @Override
+    protected void onDestroy() {
+        try {
+            if (progressDialog!= null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        super.onDestroy();
     }
 }

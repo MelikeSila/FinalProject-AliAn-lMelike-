@@ -74,21 +74,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-
-        <dependency>
-            <groupId>
-                com.firebase
-            </groupId>
-
-            <artifactId>
-                geofire-android
-            </artifactId>
-
-            <version>
-                2.1.1
-            </version>
-        </dependency>
-
         <activity
             android:name=".SelectedGameActivity"
             android:label="@string/title_activity_selected_game"

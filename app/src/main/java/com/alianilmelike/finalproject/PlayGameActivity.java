@@ -33,6 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +47,8 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
     private static String TAG = "PlayGameActivity";
     public double latitude=0.0, longitude=0.0;
     private Marker mCustomerMarker;
-    private List<String> gameIds = new ArrayList<>();
+    private List<String> gameIds = new ArrayList<>(0);
+    private HashMap <String, String> markerIdGameIdMap = new HashMap<>(0);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,7 +104,7 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
         if (mLastLocation != null) {
             mLatitude = mLastLocation.getLatitude();
             mLongitude = mLastLocation.getLongitude();
-            Toast.makeText(this, ""+String.valueOf(mLastLocation.getLatitude())+"-"+String.valueOf(mLastLocation.getLongitude()), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, ""+String.valueOf(mLastLocation.getLatitude())+"-"+String.valueOf(mLastLocation.getLongitude()), Toast.LENGTH_SHORT).show();
             //zoom to current position:
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude())).zoom(14).build(); //
@@ -164,7 +166,7 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for(DataSnapshot ds : dataSnapshot.getChildren()) {
                             gameIds.add(ds.getKey());
-                            Toast.makeText(getApplicationContext(),ds.getKey(),Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getApplicationContext(),ds.getKey(),Toast.LENGTH_SHORT).show();
                             createDataListener(ds.getKey());
                         }
                     }
@@ -174,16 +176,16 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
                     }
                 });
     }
-    public void createDataListener(String path){
+    public void createDataListener(final String path){
         DatabaseReference mPostReference = FirebaseDatabase.getInstance().getReference("game/"+path+"/");
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
                 PostGame post = dataSnapshot.getValue(PostGame.class);
-                latitude = post.location_latitude;
-                longitude = post.location_longitude;
-                List <String> urls= post.photo_url;
+                latitude = post.start_location_latitude;
+                longitude = post.start_location_longitude;
+                String urls= post.photo_url;
                 /*for(String s : urls){
                     Toast.makeText(getApplicationContext(), s,Toast.LENGTH_LONG).show();
                 }*/
@@ -196,14 +198,15 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
                 LatLng mCustomerLatLng = new LatLng(latitude, longitude);
                 MarkerOptions options = new MarkerOptions();
                 //mMap.addMarker(options.position(mCustomerLatLng).title(getResources().getString(R.string.app_name)));
-                mMap.addMarker(options.position(mCustomerLatLng).title("Click to Start"));
+                Marker myMarker = mMap.addMarker(options.position(mCustomerLatLng).title("Click to Start"));
+                markerIdGameIdMap.put(myMarker.getId(), path);
                 mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                     @Override
                     public void onInfoWindowClick(Marker marker) {
                         Intent intent = new Intent(PlayGameActivity.this,SelectedGameActivity.class);
+                        String gameId = markerIdGameIdMap.get(marker.getId());
+                        intent.putExtra(SelectedGameActivity.KEY_GAME_ID,gameId);
                         startActivity(intent);
-
-
                     }
                 });
                 //options.icon(BitmapDescriptorFactory.fromResource(R.drawable.aaaa));
@@ -220,8 +223,6 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
             }
         };
         mPostReference.addValueEventListener(postListener);
-
-
     }
 
     @Override

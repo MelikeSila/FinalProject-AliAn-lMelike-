@@ -136,7 +136,7 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         setStartLocation = (Button) findViewById(R.id.setStartLocation);
         takeButton = (Button) findViewById(R.id.takePhoto);
         addSubGameButton = (Button) findViewById(R.id.addSubGameButton);
-        uploadButton = (Button) findViewById(R.id.uploadPhoto);
+        uploadButton = (Button) findViewById(R.id.uploadGame);
 
         setLocation.setOnClickListener(this);
         setStartLocation.setOnClickListener(this);
@@ -174,7 +174,7 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
             case R.id.addSubGameButton:
                 AddSubGameButton();
                 break;
-            case R.id.uploadPhoto:
+            case R.id.uploadGame:
                 upload();
                 break;
         }

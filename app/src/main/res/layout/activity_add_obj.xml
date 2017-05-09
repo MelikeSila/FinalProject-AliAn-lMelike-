@@ -50,7 +50,7 @@
         android:text="Add Target" />
 
     <Button
-        android:id="@+id/uploadPhoto"
+        android:id="@+id/uploadGame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/addSubGameButton"

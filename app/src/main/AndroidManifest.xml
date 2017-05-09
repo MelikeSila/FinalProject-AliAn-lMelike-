@@ -51,37 +51,17 @@
                 android:value="com.alianilmelike.finalproject.MainActivity" />
         </activity>
         <activity
-            android:name=".CreateGameActivity"
-            android:label="@string/title_activity_create_game"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.alianilmelike.finalproject.MainActivity" />
-        </activity>
-        <activity
-            android:name=".ObjPropertyActivity"
-            android:label="@string/title_activity_obj_property"
-            android:parentActivityName=".CreateGameActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.alianilmelike.finalproject.CreateGameActivity" />
-        </activity>
-        <activity
-            android:name=".AddObjActivity"
-            android:label="@string/title_activity_add_obj"
-            android:parentActivityName=".ObjPropertyActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.alianilmelike.finalproject.ObjPropertyActivity" />
-        </activity>
-        <activity
             android:name=".SetLocationActivity"
             android:label="@string/title_activity_set_location">
             <meta-data
                 android:name="android.support.AddObjActivity"
                 android:value="com.alianilmelike.finalproject.AddObjActivity" />
+        </activity>
+
+        <activity
+            android:name=".AddObjActivity"
+            android:label="@string/title_activity_add_obj"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
         <!-- File provider -->
@@ -117,6 +97,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.alianilmelike.finalproject.PlayGameActivity" />
         </activity>
+        <activity
+            android:name=".SetStartLocationActivity"
+            android:label="@string/title_activity_set_start_location" />
+        <activity android:name=".SetObjectActivity"></activity>
     </application>
 
 </manifest>

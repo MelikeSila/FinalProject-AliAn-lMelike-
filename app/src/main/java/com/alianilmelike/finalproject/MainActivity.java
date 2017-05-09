@@ -15,7 +15,7 @@ public class MainActivity extends Activity  implements View.OnClickListener {
         setContentView(R.layout.activity_main);
         mListView = (ViewGroup) findViewById(R.id.list);
         addDemo("Play Game", PlayGameActivity.class);
-        addDemo("Create Game", CreateGameActivity.class);
+        addDemo("Create Game", AddObjActivity.class);
 //        addDemo("Add A Game", AddActivity.class);
 //        addDemo("Gallery", PhotoActivity.class);
         addDemo("HELP!", MainActivity.class);

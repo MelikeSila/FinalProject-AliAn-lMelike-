@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
@@ -40,6 +41,7 @@ import java.util.List;
 import Module.Game;
 import Module.PlayedGame;
 import Module.TargetModel;
+import Module.LocationModel;
 import Module.User;
 import icepick.Icepick;
 import icepick.State;
@@ -47,12 +49,17 @@ import icepick.State;
 import static com.alianilmelike.finalproject.SetLocationActivity.KEY_LATITUDE;
 import static com.alianilmelike.finalproject.SetLocationActivity.KEY_LONGITUDE;
 import static com.alianilmelike.finalproject.SetLocationActivity.KEY_STRING;
+import static com.alianilmelike.finalproject.SetStartLocationActivity.KEY_STRING_START;
+import static com.alianilmelike.finalproject.SetStartLocationActivity.START_KEY_LATITUDE;
+import static com.alianilmelike.finalproject.SetStartLocationActivity.START_KEY_LONGITUDE;
 
 public class AddObjActivity extends AppCompatActivity  implements View.OnClickListener{
     public static final int SET_LOCATION_REQUEST_CODE = 4444 ;
+    public static final int START_LOCATION_REQUEST_CODE = 5555;
     private static final int PICK_IMAGE_ACTIVITY_REQUEST_CODE = 3737;
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 7171;
     private static final String KEY_TARGET_LIST = "KeyTargetList";
+    private static final String KEY_LOCATION_LIST = "LocationGetList";
 
     FirebaseUser user;
     //to authantication
@@ -61,15 +68,19 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     private FirebaseAuth.AuthStateListener mAuthListener;
     @State double longitude;
     @State double latitude;
+    @State double startLongitude;
+    @State double startLatitude;
     public List<String> photoList;
     ImageView imageView;
-    Button setLocation, takeButton, uploadButton, addSubGameButton;
+    Button setLocation, setStartLocation, takeButton, uploadButton, addSubGameButton;
     public Uri downloadUrl;
     @State String imagePath = null;
     private String oldPath=null;
     private String gameStatus=null;
     List <TargetModel> targetModelList = new ArrayList<>();
+    LocationModel locationModel = new LocationModel();
     @State String photoUrl;
+    @State int isTarget=0;
     public ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +88,7 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         Icepick.restoreInstanceState(this, savedInstanceState);
         if (savedInstanceState != null){
             targetModelList = Parcels.unwrap(savedInstanceState.getParcelable(KEY_TARGET_LIST));
+            locationModel = Parcels.unwrap(getIntent().getParcelableExtra(KEY_LOCATION_LIST));
         }
 
         setContentView(R.layout.activity_add_obj);
@@ -121,11 +133,13 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         ///////////////////////////
         imageView = (ImageView) findViewById(R.id.imageContainer);
         setLocation = (Button) findViewById(R.id.setLocation);
+        setStartLocation = (Button) findViewById(R.id.setStartLocation);
         takeButton = (Button) findViewById(R.id.takePhoto);
         addSubGameButton = (Button) findViewById(R.id.addSubGameButton);
         uploadButton = (Button) findViewById(R.id.uploadPhoto);
 
         setLocation.setOnClickListener(this);
+        setStartLocation.setOnClickListener(this);
         takeButton.setOnClickListener(this);
         addSubGameButton.setOnClickListener(this);
         uploadButton.setOnClickListener(this);
@@ -138,7 +152,11 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     @Override public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(KEY_TARGET_LIST, Parcels.wrap(targetModelList));
         super.onSaveInstanceState(outState);
+        outState.putParcelable(KEY_LOCATION_LIST, locationModel);
+
         Icepick.saveInstanceState(this, outState);
+
+
     }
 
     @Override
@@ -147,15 +165,16 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
             case R.id.setLocation:
                 setLocation();
                 break;
+            case R.id.setStartLocation:
+                setStartLocation();
+                break;
             case R.id.takePhoto:
                 takePhoto();
                 break;
             case R.id.addSubGameButton:
-                gameStatus = "subGame";
                 AddSubGameButton();
                 break;
             case R.id.uploadPhoto:
-                gameStatus ="newGame";
                 upload();
                 break;
         }
@@ -165,6 +184,12 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         Intent i = new Intent(getApplicationContext(), SetLocationActivity.class);
         i.putExtra(KEY_STRING,43);
         startActivityForResult(i,SET_LOCATION_REQUEST_CODE);
+    }
+
+    private void setStartLocation() {
+        Intent i = new Intent(getApplicationContext(), SetStartLocationActivity.class);
+        i.putExtra(KEY_STRING_START,45);
+        startActivityForResult(i,START_LOCATION_REQUEST_CODE);
     }
 
     private void pickPhoto() {
@@ -210,23 +235,31 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         }
     }
     private void AddSubGameButton(){
-        if(latitude == 0d && longitude == 0d){
-            Toast.makeText(getApplicationContext(), "please select Location", Toast.LENGTH_SHORT).show();
+        if(latitude == 0d || longitude == 0d){
+            Toast.makeText(getApplicationContext(), "Please Select Target Location!", Toast.LENGTH_SHORT).show();
         }else{
+            isTarget = 1;
             uploadPhoto();
         }
         //Intent i = new Intent(getApplicationContext(), AddObjActivity.class);
         //startActivity(i);
     }
     private void upload(){
-        uploadOtherData();
+        if(startLongitude == 0d || startLongitude == 0d){
+            Toast.makeText(getApplicationContext(), "Please Select Start Location", Toast.LENGTH_SHORT).show();
+        }else if(isTarget == 0) {
+            Toast.makeText(getApplicationContext(), "Please Add Target Firstly!", Toast.LENGTH_SHORT).show();
+        }else{
+            isTarget = 0;
+            uploadOtherData();
+        }
     }
     //we call tgis method under onSuccess method in uploadPhoto. because take photos url.
     private void uploadOtherData(){
         //uploadUser();
         uploadGame();
-        //uploadPlayedGame();
         finish();
+        //uploadPlayedGame();
     }
 
     private void uploadUser(){
@@ -250,8 +283,10 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
         int minute = c.get(Calendar.MINUTE);
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int day = c.get(Calendar.DATE);
-
-        Game obje = new Game(targetModelList, minute, hour, day);
+        locationModel = new LocationModel(startLatitude, startLongitude);
+        locationModel.startLatitude = startLatitude;
+        locationModel.startLongitude = startLongitude;
+        Game obje = new Game(targetModelList, minute, hour, day, locationModel);
         oldPath = obje.path;
     }
 
@@ -336,7 +371,10 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
             }  else if(requestCode == SET_LOCATION_REQUEST_CODE){
                 latitude = data.getDoubleExtra(KEY_LATITUDE, 0.0);
                 longitude = data.getDoubleExtra(KEY_LONGITUDE, 0.0);
-
+            }else if(requestCode == START_LOCATION_REQUEST_CODE){
+                startLatitude = data.getDoubleExtra(START_KEY_LATITUDE, 0.0);
+                startLongitude = data.getDoubleExtra(START_KEY_LONGITUDE, 0.0);
+                Toast.makeText(getApplicationContext(),startLatitude + "Token",Toast.LENGTH_SHORT).show();
             }
         }
     }

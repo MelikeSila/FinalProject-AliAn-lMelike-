@@ -10,15 +10,15 @@ import org.parceler.Parcel;
 @Parcel
 public class TargetModel  {
     public String photoUrl;
-    public double latitude;
-    public double longitude;
+    public double targetLatitude;
+    public double targetLongitude;
 
     public TargetModel(){
 
     }
     public TargetModel(String photoUrl, double latitude, double longitude){
         this.photoUrl = photoUrl;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.targetLatitude = latitude;
+        this.targetLongitude = longitude;
     }
 }

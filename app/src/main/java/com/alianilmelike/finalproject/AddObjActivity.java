@@ -256,10 +256,10 @@ public class AddObjActivity extends AppCompatActivity  implements View.OnClickLi
     }
     //we call tgis method under onSuccess method in uploadPhoto. because take photos url.
     private void uploadOtherData(){
-        //uploadUser();
+        uploadUser();
         uploadGame();
         finish();
-        //uploadPlayedGame();
+        uploadPlayedGame();
     }
 
     private void uploadUser(){

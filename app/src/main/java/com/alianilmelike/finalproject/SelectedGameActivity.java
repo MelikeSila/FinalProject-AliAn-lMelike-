@@ -9,6 +9,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,14 +28,15 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import Module.LocationModel;
 import Module.PostGame;
 import Module.TargetModel;
 
-public class SelectedGameActivity extends AppCompatActivity {
+public class SelectedGameActivity extends AppCompatActivity{
 
     private TextView mTextMessage;
     public final static String KEY_GAME_ID = "KeyGameId";
-    private double latitude, longitude;
+    private double userLatitude, userLongitude;
     public String gameId;
     public String url;
     private List<String> targetIds = new ArrayList<>(0);

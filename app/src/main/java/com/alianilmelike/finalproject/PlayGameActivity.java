@@ -149,7 +149,7 @@ public class PlayGameActivity extends FragmentActivity implements OnMapReadyCall
             //  mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
             //mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
         }else{
-            Toast.makeText(this, "Cannot take location! ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please Open Location! ", Toast.LENGTH_SHORT).show();
         }
 
 
